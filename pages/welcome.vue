@@ -68,6 +68,7 @@ export default {
                 }
             }).then((res)=>{
                 if(res.data.status == 200){
+                    localStorage.clear()
                     this.$router.push('/login')
                 }
             })
