@@ -25,7 +25,6 @@ export default {
     },
     data(){
         return{
-            token: localStorage.getItem('auth_token'),
             name:'',
             email: '',
             last_login: ''
@@ -35,11 +34,10 @@ export default {
         getUserDetails(){
             const url = new URL(window.location.href);
             let user = url.searchParams.get('user')
-            let token = url.searchParams.get('token')
             if(!user){
                 this.$axios.get('/me',{
                 headers:{
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${localStorage.getItem('auth_token')}`
                 }
             }).then((res)=>{
                 console.log(res.data)
@@ -48,9 +46,10 @@ export default {
                 this.last_login = res.data.data.last_logged_in
             })
             }else{
+                localStorage.setItem('auth_token',url.searchParams.get('token'))
                 this.$axios.get('/me',{
                 headers:{
-                    Authorization: `Bearer ${token}`
+                    Authorization: `Bearer ${url.searchParams.get('token')}`
                 }
             }).then((res)=>{
                 console.log(res.data)
@@ -63,8 +62,9 @@ export default {
         },
         logout(){
             this.$axios.post('/logout',{
+            },{
                 headers:{
-                    Authorization: `Bearer ${this.token}`
+                    Authorization: `Bearer ${localStorage.getItem('auth_token')}`,
                 }
             }).then((res)=>{
                 if(res.data.status == 200){
