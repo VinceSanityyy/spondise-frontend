@@ -10,8 +10,6 @@
                         <h5>Hi {{ this.name }}</h5>
                         <h5>Your email is {{ this.email }}</h5>
                         <h5>Your last login was on {{ this.last_login }}</h5>
-                    </div>
-                    <div class="card-footer">
                         <button @click="logout()" class="btn btn-primary" type="button">Logout</button>
                     </div>
                 </div>
@@ -35,7 +33,11 @@ export default {
     },
     methods:{
         getUserDetails(){
-            this.$axios.get('/me',{
+            const url = new URL(window.location.href);
+            let user = url.searchParams.get('user')
+            let token = url.searchParams.get('token')
+            if(!user){
+                this.$axios.get('/me',{
                 headers:{
                     Authorization: `Bearer ${this.token}`
                 }
@@ -44,8 +46,20 @@ export default {
                 this.name = res.data.data.name,
                 this.email = res.data.data.email
                 this.last_login = res.data.data.last_logged_in
-
             })
+            }else{
+                this.$axios.get('/me',{
+                headers:{
+                    Authorization: `Bearer ${token}`
+                }
+            }).then((res)=>{
+                console.log(res.data)
+                this.name = res.data.data.name,
+                this.email = res.data.data.email
+                this.last_login = res.data.data.last_logged_in
+            })
+            }
+       
         },
         logout(){
             this.$axios.post('/logout',{
@@ -61,3 +75,16 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+.card {
+  position: absolute;
+  margin: auto;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 800px;
+  height: 200px;
+}
+</style>
